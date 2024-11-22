@@ -10,19 +10,19 @@
 #include <cctype>
 
 #if defined(_WIN32) || defined(_WIN64)
-#include <direct.h>  // Windows »·¾³ÏÂĞèÒª´ËÍ·ÎÄ¼ş
-#define mkdir _mkdir   // Windows ÉÏµÄ mkdir
+#include <direct.h>  // Windows ç¯å¢ƒä¸‹éœ€è¦æ­¤å¤´æ–‡ä»¶
+#define mkdir _mkdir   // Windows ä¸Šçš„ mkdir
 #else
-#include <sys/stat.h>  // Unix/Linux »·¾³ÏÂĞèÒª´ËÍ·ÎÄ¼ş
+#include <sys/stat.h>  // Unix/Linux ç¯å¢ƒä¸‹éœ€è¦æ­¤å¤´æ–‡ä»¶
 #endif
 
-// ×ÔÈ»ÅÅĞò±È½ÏÆ÷
+// è‡ªç„¶æ’åºæ¯”è¾ƒå™¨
 bool natural_sort(const std::string &a, const std::string &b) {
     auto is_digit = [](char c) { return std::isdigit(c); };
 
     size_t i = 0, j = 0;
     while (i < a.size() && j < b.size()) {
-        // ÕÒµ½Êı×Ö²¿·Ö
+        // æ‰¾åˆ°æ•°å­—éƒ¨åˆ†
         if (is_digit(a[i]) && is_digit(b[j])) {
             std::string num_a, num_b;
             while (i < a.size() && std::isdigit(a[i])) {
@@ -31,7 +31,7 @@ bool natural_sort(const std::string &a, const std::string &b) {
             while (j < b.size() && std::isdigit(b[j])) {
                 num_b += b[j++];
             }
-            // ±È½ÏÊı×Ö´óĞ¡
+            // æ¯”è¾ƒæ•°å­—å¤§å°
             if (std::stoi(num_a) != std::stoi(num_b)) {
                 return std::stoi(num_a) < std::stoi(num_b);
             }
@@ -46,7 +46,7 @@ bool natural_sort(const std::string &a, const std::string &b) {
     return a.size() < b.size();
 }
 
-// ÅĞ¶ÏÎÄ¼şÊÇ·ñ¾ßÓĞÖ¸¶¨ºó×º
+// åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å…·æœ‰æŒ‡å®šåç¼€
 bool has_extension(const std::string& filename, const std::string& extension) {
     return filename.size() >= extension.size() &&
            filename.compare(filename.size() - extension.size(), extension.size(), extension) == 0;
@@ -57,18 +57,18 @@ void copy_file(const std::string& source, const std::string& destination) {
     std::ofstream dest(destination, std::ios::binary);
 
     if (!src.is_open() || !dest.is_open()) {
-        std::cerr << "´ò¿ªÎÄ¼şÊ§°Ü¡£" << std::endl;
+        std::cerr << "æ‰“å¼€æ–‡ä»¶å¤±è´¥ã€‚" << std::endl;
         return;
     }
 
-    dest << src.rdbuf();  // ¸´ÖÆÎÄ¼şÄÚÈİ
-    std::cout << "ÒÑ¸´ÖÆ: " << source << " -> " << destination << std::endl;
+    dest << src.rdbuf();  // å¤åˆ¶æ–‡ä»¶å†…å®¹
+    std::cout << "å·²å¤åˆ¶: " << source << " -> " << destination << std::endl;
 }
 
 void copy_and_rename_files(const std::string& source_dir, const std::string& target_dir, const std::string& name_prefix, int& counter, const std::string& extension) {
     DIR* dir = opendir(source_dir.c_str());
     if (dir == nullptr) {
-        std::cerr << "ÎŞ·¨´ò¿ªÄ¿Â¼: " << source_dir << std::endl;
+        std::cerr << "æ— æ³•æ‰“å¼€ç›®å½•: " << source_dir << std::endl;
         return;
     }
 
@@ -77,30 +77,30 @@ void copy_and_rename_files(const std::string& source_dir, const std::string& tar
     while ((entry = readdir(dir)) != nullptr) {
         std::string filename = entry->d_name;
         
-        // Ìø¹ı "." ºÍ ".."
+        // è·³è¿‡ "." å’Œ ".."
         if (filename == "." || filename == "..") {
             continue;
         }
 
-        // Ö»´¦Àí¾ßÓĞÖ¸¶¨ºó×ºµÄÎÄ¼ş
+        // åªå¤„ç†å…·æœ‰æŒ‡å®šåç¼€çš„æ–‡ä»¶
         if (has_extension(filename, extension)) {
-            files.push_back(filename);  // ÊÕ¼¯ÎÄ¼şÃû
+            files.push_back(filename);  // æ”¶é›†æ–‡ä»¶å
         }
     }
 
-    // °´×ÔÈ»ÅÅĞòÅÅĞòÎÄ¼ş
+    // æŒ‰è‡ªç„¶æ’åºæ’åºæ–‡ä»¶
     std::sort(files.begin(), files.end(), natural_sort);
 
-    // ¸´ÖÆÎÄ¼ş²¢ÖØÃüÃû
+    // å¤åˆ¶æ–‡ä»¶å¹¶é‡å‘½å
     for (const auto& filename : files) {
         std::string old_path = source_dir + "/" + filename;
         std::string new_name = name_prefix + std::to_string(counter++) + "." + filename.substr(filename.find_last_of('.') + 1);
         std::string new_path = target_dir + "/" + new_name;
 
-        copy_file(old_path, new_path);  // ¸´ÖÆ²¢ÖØÃüÃûÎÄ¼ş
+        copy_file(old_path, new_path);  // å¤åˆ¶å¹¶é‡å‘½åæ–‡ä»¶
     }
 
-    closedir(dir);  // ¹Ø±ÕÄ¿Â¼
+    closedir(dir);  // å…³é—­ç›®å½•
 }
 
 int main() {
@@ -108,53 +108,53 @@ int main() {
     int num_dirs;
     std::string extension;
 
-    // ¶ÁÈ¡Ä¿±êÎÄ¼ş¼ĞÂ·¾¶
-    std::cout << "ÇëÊäÈëÄ¿±êÄ¿Â¼Â·¾¶: ";
+    // è¯»å–ç›®æ ‡æ–‡ä»¶å¤¹è·¯å¾„
+    std::cout << "è¯·è¾“å…¥ç›®æ ‡ç›®å½•è·¯å¾„: ";
     std::cin >> target_dir;
 
-    // ´´½¨Ä¿±êÎÄ¼ş¼Ğ£¨Èç¹û²»´æÔÚ£©
+    // åˆ›å»ºç›®æ ‡æ–‡ä»¶å¤¹ï¼ˆå¦‚æœä¸å­˜åœ¨ï¼‰
     #if defined(_WIN32) || defined(_WIN64)
         if (access(target_dir.c_str(), 0) == -1) {
             if (mkdir(target_dir.c_str()) == -1) {
-                std::cerr << "´´½¨Ä¿±êÄ¿Â¼Ê§°Ü¡£" << std::endl;
+                std::cerr << "åˆ›å»ºç›®æ ‡ç›®å½•å¤±è´¥ã€‚" << std::endl;
                 return 1;
             }
-            std::cout << "ÒÑ´´½¨Ä¿±êÄ¿Â¼: " << target_dir << std::endl;
+            std::cout << "å·²åˆ›å»ºç›®æ ‡ç›®å½•: " << target_dir << std::endl;
         }
     #else
         if (access(target_dir.c_str(), F_OK) == -1) {
             if (mkdir(target_dir.c_str(), 0777) == -1) {
-                std::cerr << "´´½¨Ä¿±êÄ¿Â¼Ê§°Ü¡£" << std::endl;
+                std::cerr << "åˆ›å»ºç›®æ ‡ç›®å½•å¤±è´¥ã€‚" << std::endl;
                 return 1;
             }
-            std::cout << "ÒÑ´´½¨Ä¿±êÄ¿Â¼: " << target_dir << std::endl;
+            std::cout << "å·²åˆ›å»ºç›®æ ‡ç›®å½•: " << target_dir << std::endl;
         }
     #endif
 
-    // ¶ÁÈ¡Ô´ÎÄ¼ş¼ĞÂ·¾¶
-    std::cout << "ÇëÊäÈëÔ´Ä¿Â¼µÄÊıÁ¿: ";
+    // è¯»å–æºæ–‡ä»¶å¤¹è·¯å¾„
+    std::cout << "è¯·è¾“å…¥æºç›®å½•çš„æ•°é‡: ";
     std::cin >> num_dirs;
 
     std::vector<std::string> source_dirs(num_dirs);
 
-    std::cout << "ÇëÊäÈëÔ´Ä¿Â¼µÄÂ·¾¶: " << std::endl;
+    std::cout << "è¯·è¾“å…¥æºç›®å½•çš„è·¯å¾„: " << std::endl;
     for (int i = 0; i < num_dirs; i++) {
         std::cin >> source_dirs[i];
     }
 
-    // ¶ÁÈ¡Ö¸¶¨µÄÎÄ¼şºó×º
-    std::cout << "ÇëÊäÈëÎÄ¼şºó×º£¨Èç£º.txt¡¢.jpgµÈ£©: ";
+    // è¯»å–æŒ‡å®šçš„æ–‡ä»¶åç¼€
+    std::cout << "è¯·è¾“å…¥æ–‡ä»¶åç¼€ï¼ˆå¦‚ï¼š.txtã€.jpgç­‰ï¼‰: ";
     std::cin >> extension;
 
-    std::string name_prefix = "file_";  // ÎÄ¼şÃûÇ°×º
-    int counter = 1;  // ÎÄ¼ş±àºÅÆğÊ¼Öµ
+    std::string name_prefix = "file_";  // æ–‡ä»¶åå‰ç¼€
+    int counter = 1;  // æ–‡ä»¶ç¼–å·èµ·å§‹å€¼
 
-    // °´ÕÕÔ´Ä¿Â¼Ë³Ğò½øĞĞ´¦Àí
+    // æŒ‰ç…§æºç›®å½•é¡ºåºè¿›è¡Œå¤„ç†
     for (int i = 0; i < num_dirs; i++) {
         copy_and_rename_files(source_dirs[i], target_dir, name_prefix, counter, extension);
     }
 
-    std::cout << "ÎÄ¼şºÏ²¢ºÍÖØÃüÃûÍê³É£¡" << std::endl;
+    std::cout << "æ–‡ä»¶åˆå¹¶å’Œé‡å‘½åå®Œæˆï¼" << std::endl;
     return 0;
 }
 
