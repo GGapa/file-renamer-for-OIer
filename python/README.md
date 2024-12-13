@@ -7,6 +7,8 @@
 
 完成重命名后会造对应目录下生成日志文件，名为 `rename_log.txt` 里面详细的列出了文件名发生的变化，检查无误后删除即可。
 
+若您的电脑上没有 Python 环境，你可以在[这里](https://github.com/GGapa/file-renamer-for-OIer/releases/tag/release)找到已经编译好的版本。
+
 ------
 
 convert.py 是一个把文档中所有数学公式内 `_` 替换为 `\_` 的 Python 代码，用于某些 Markdown 和 Latex 渲染冲突的地方。
